@@ -4,9 +4,9 @@ class Sekolah {
   final String npsn;
   final String jenjang;
   final String statusSekolah;
-  final int pesertaDidik;
-  final int rombel;
-  final int guru;
+  final int? pesertaDidik;
+  final int? rombel;
+  final int? guru;
 
   Sekolah({
     required this.sekolahId,
@@ -14,9 +14,9 @@ class Sekolah {
     required this.npsn,
     required this.jenjang,
     required this.statusSekolah,
-    required this.pesertaDidik,
-    required this.rombel,
-    required this.guru,
+    this.pesertaDidik,
+    this.rombel,
+    this.guru,
   });
 
   factory Sekolah.fromJson(Map<String, dynamic> json) {
@@ -26,9 +26,9 @@ class Sekolah {
       npsn: json['npsn'],
       jenjang: json['jenjang'],
       statusSekolah: json['status_sekolah'],
-      pesertaDidik: json['peserta_didik'],
-      rombel: json['rombel'],
-      guru: json['guru'],
+      pesertaDidik: json['peserta_didik'] ?? 0,
+      rombel: json['rombel'] ?? 0,
+      guru: json['guru'] ?? 0,
     );
   }
 }

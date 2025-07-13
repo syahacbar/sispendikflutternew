@@ -1,30 +1,50 @@
 import 'package:flutter/material.dart';
+import '../../../models/distrik_model.dart';
+import '../../../models/sekolah_model.dart';
+import '../../../services/api_service.dart';
 
 class ListSekolahPage extends StatelessWidget {
-  final String distrik;
-
-  const ListSekolahPage({super.key, required this.distrik});
+  const ListSekolahPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // Simulasi data sekolah
-    final sekolah = [
-      'SD Negeri 1 $distrik',
-      'SMP Negeri 1 $distrik',
-      'SMA Negeri 1 $distrik',
-    ];
+    final distrik = ModalRoute.of(context)!.settings.arguments as Distrik;
 
     return Scaffold(
-      appBar: AppBar(title: Text('Daftar Sekolah di $distrik')),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: sekolah.length,
-        itemBuilder: (context, index) {
-          return Card(
-            child: ListTile(
-              title: Text(sekolah[index]),
-              leading: const Icon(Icons.school),
-            ),
+      appBar: AppBar(title: Text('Sekolah di ${distrik.nama}')),
+      body: FutureBuilder<List<Sekolah>>(
+        future: ApiService.fetchSekolahByDistrik(distrik.kode),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(
+              child: Text('Gagal memuat sekolah: ${snapshot.error}'),
+            );
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('Belum ada sekolah.'));
+          }
+
+          final sekolahList = snapshot.data!;
+          return ListView.builder(
+            itemCount: sekolahList.length,
+            itemBuilder: (context, index) {
+              final s = sekolahList[index];
+              return Card(
+                child: ListTile(
+                  title: Text(s.nama),
+                  subtitle: Text('${s.jenjang} • ${s.statusSekolah}'),
+                  trailing: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text('PD: ${s.pesertaDidik}'),
+                      Text('Rombel: ${s.rombel}'),
+                      Text('Guru: ${s.guru}'),
+                    ],
+                  ),
+                ),
+              );
+            },
           );
         },
       ),
